@@ -9,7 +9,6 @@ import com.example.flo.databinding.ActivitySongBinding
 class SongActivity : AppCompatActivity() {
     // 안드로이드에서 액티비티의 기능들을 사용할 수 있도록 만든 클래스
     lateinit var binding : ActivitySongBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // xml에 표기된 레이아웃들 메모리에 객체화
@@ -24,6 +23,11 @@ class SongActivity : AppCompatActivity() {
         }
         binding.songPlayerPauseIv.setOnClickListener {
             setPlayerStatus(false)
+        }
+
+        if(intent.hasExtra("title") && intent.hasExtra("singer")){
+            binding.songPlayerTitleTv.text = intent.getStringExtra("title")
+            binding.songPlayerSingerTv.text = intent.getStringExtra("singer")
         }
     }
     private fun setPlayerStatus(isPlaying: Boolean){

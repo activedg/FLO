@@ -18,6 +18,9 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
-
+    </style>
+    <!-- Switch(AlbumActivity) Theme-->
+    <style name="switchTheme">
+        <item name="colorControlActivated">@color/flo</item>
     </style>
 </resources>
