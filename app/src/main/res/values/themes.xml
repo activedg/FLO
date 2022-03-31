@@ -17,10 +17,13 @@
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
     <!-- Switch(AlbumActivity) Theme-->
     <style name="switchTheme">
         <item name="colorControlActivated">@color/flo</item>
     </style>
+    <!-- Tab Text Style-->
+
 </resources>
