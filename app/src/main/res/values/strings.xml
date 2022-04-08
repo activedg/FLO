@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">FLO</string>
+    <string name="pannel1">매혹적인 음색의 여성 보컬\n팝</string>
+    <string name="pannel2">달콤한 휴식과 함께\n듣는 뉴에이지</string>
+    <string name="pannel3">카페테라스에\n흐르는 발라드</string>
+    <string name="pannel4">리드미컬한 국내\n팝 발라드</string>
+    <string name="pannel5">어깨 춤을 추게 하는\n신나는 드라이빙 댄스</string>
 </resources>

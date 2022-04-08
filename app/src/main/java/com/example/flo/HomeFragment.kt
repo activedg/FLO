@@ -9,7 +9,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.flo.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
-
     lateinit var binding: FragmentHomeBinding
 
     override fun onCreateView(
@@ -18,7 +17,8 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-
+        // Pannel ViewPager
+        initHomePannel()
         binding.homeAlbumImg01Iv.setOnClickListener {
             // MainActivity 안에 있는 Fragment/ MainActivity 안에 있는 FrameLayout 변경
             (context as MainActivity).supportFragmentManager.beginTransaction()
@@ -33,5 +33,28 @@ class HomeFragment : Fragment() {
         binding.homeBannerVp.adapter = bannerAdapter
         binding.homeBannerVp.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         return binding.root
+    }
+
+    private fun initHomePannel(){
+        val pannel1 = Pannel(R.drawable.img_pannel1, getString(R.string.pannel1), R.drawable.img_album_exp, "Butter", "BTS"
+                        , R.drawable.img_album_exp2, "LILAC", "아이유(IU)")
+        val pannel2 = Pannel(R.drawable.img_pannel2, getString(R.string.pannel2), R.drawable.img_album_exp3, "Next Level", "Aespa"
+                        , R.drawable.img_album_exp4, "작은 것들을 위한 시", "BTS")
+        val pannel3 = Pannel(R.drawable.img_pannel3, getString(R.string.pannel3), R.drawable.img_album_exp5, "BAAM", "모모랜드"
+            , R.drawable.img_album_exp6, "Weekend", "태연")
+        val pannel4 = Pannel(R.drawable.img_pannel4, getString(R.string.pannel4), R.drawable.img_album_exp, "Butter", "BTS"
+            , R.drawable.img_album_exp2, "LILAC", "아이유(IU)")
+        val pannel5 = Pannel(R.drawable.img_pannel5, getString(R.string.pannel5), R.drawable.img_album_exp5, "BAAM", "모모랜드"
+            , R.drawable.img_album_exp6, "Weekend", "태연")
+
+        val pannelAdapter = PannelVPAdapter(this)
+        pannelAdapter.addFragment(PannelFragment(pannel1))
+        pannelAdapter.addFragment(PannelFragment(pannel2))
+        pannelAdapter.addFragment(PannelFragment(pannel3))
+        pannelAdapter.addFragment(PannelFragment(pannel4))
+        pannelAdapter.addFragment(PannelFragment(pannel5))
+
+        binding.homePannelVp.adapter = pannelAdapter
+        binding.homePannelIndicator.setViewPager(binding.homePannelVp)
     }
 }

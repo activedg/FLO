@@ -28,7 +28,7 @@ class AlbumFragment : Fragment() {
         val albumAdapter = AlbumVPAdapter(this)
         binding.albumContentVp.adapter = albumAdapter
 
-        //TabLayout 메뉴 설정과 TabLayout과 ViewPager2 연결결
+        //TabLayout 메뉴 설정과 TabLayout과 ViewPager2 연결
        TabLayoutMediator(binding.albumContentTb, binding.albumContentVp) {
             tab, position -> tab.text = information[position]
         }.attach()
