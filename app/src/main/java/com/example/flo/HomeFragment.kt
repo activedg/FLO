@@ -1,6 +1,7 @@
 package com.example.flo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +11,7 @@ import com.example.flo.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
     lateinit var binding: FragmentHomeBinding
-
+    lateinit var timer: Timer
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -19,6 +20,8 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         // Pannel ViewPager
         initHomePannel()
+        // 자동 슬라이드 타이머
+        initTimer()
         binding.homeAlbumImg01Iv.setOnClickListener {
             // MainActivity 안에 있는 Fragment/ MainActivity 안에 있는 FrameLayout 변경
             (context as MainActivity).supportFragmentManager.beginTransaction()
@@ -33,6 +36,11 @@ class HomeFragment : Fragment() {
         binding.homeBannerVp.adapter = bannerAdapter
         binding.homeBannerVp.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         return binding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timer.interrupt()
     }
 
     private fun initHomePannel(){
@@ -56,5 +64,30 @@ class HomeFragment : Fragment() {
 
         binding.homePannelVp.adapter = pannelAdapter
         binding.homePannelIndicator.setViewPager(binding.homePannelVp)
+    }
+
+    private fun initTimer(){
+        timer = Timer()
+        timer.start()
+    }
+
+    inner class Timer() : Thread(){
+        private var second: Int = 0
+        override fun run() {
+            super.run()
+            while (true){
+                try {
+                    sleep(2000)
+                    second++
+                    second %= 5
+                    (context as MainActivity).runOnUiThread {
+                        binding.homePannelVp.setCurrentItem(second, true)
+                    }
+                } catch (e: InterruptedException){
+                    Log.d("Slide", "Slide Finish")
+                }
+
+            }
+        }
     }
 }
