@@ -13,7 +13,6 @@
 
         <!-- Remove the title bar -->
         <item name="windowNoTitle">true</item>
-
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:windowTranslucentStatus">false</item>
@@ -26,6 +25,7 @@
     <style name="switchTheme">
         <item name="colorControlActivated">@color/flo</item>
     </style>
+
 
 
 </resources>

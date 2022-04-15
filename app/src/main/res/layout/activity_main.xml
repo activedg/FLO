@@ -22,7 +22,7 @@
         android:paddingStart="0dp"
         android:paddingEnd="0dp"
         android:max="1000"
-        android:progress="80"
+        android:progress="0"
         android:thumb="@color/transparent"
         android:progressTint="@color/flo"
         app:layout_constraintStart_toStartOf="parent"
