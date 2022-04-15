@@ -15,6 +15,7 @@ class SongActivity : AppCompatActivity() {
     lateinit var song: Song
     lateinit var timer: Timer
 
+    private var currentPos = 0
     private var mediaPlayer: MediaPlayer? = null
     private var gson: Gson = Gson()
 
@@ -37,6 +38,12 @@ class SongActivity : AppCompatActivity() {
             setPlayerStatus(false)
         }
 
+        binding.songPlayerPreviousIv.setOnClickListener {
+            timer.setTimer(0)
+            mediaPlayer?.seekTo(0)
+            binding.songPlayerNowTimeTv.text = "00:00"
+        }
+
         if(intent.hasExtra("title") && intent.hasExtra("singer")){
             binding.songPlayerTitleTv.text = intent.getStringExtra("title")
             binding.songPlayerSingerTv.text = intent.getStringExtra("singer")
@@ -48,6 +55,7 @@ class SongActivity : AppCompatActivity() {
         super.onPause()
         setPlayerStatus(false)
         song.second = ((binding.songPlayerStatusSb.progress * song.playTime) ) / 1000
+        song.pos = mediaPlayer?.currentPosition!!
         val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE)
         val editor = sharedPreferences.edit() // 에디터
         val songJson = gson.toJson(song)
@@ -70,7 +78,8 @@ class SongActivity : AppCompatActivity() {
                 intent.getIntExtra("second", 0),
                 intent.getIntExtra("playTime", 0),
                 intent.getBooleanExtra("isPlaying",false),
-                intent.getStringExtra("music")!!
+                intent.getStringExtra("music")!!,
+                intent.getIntExtra("currentPos", 0)
             )
         }
         startTimer()
@@ -85,7 +94,7 @@ class SongActivity : AppCompatActivity() {
 
         val music = resources.getIdentifier(song.music, "raw", this.packageName)
         mediaPlayer = MediaPlayer.create(this, music)
-
+        mediaPlayer?.seekTo(song.pos)
         setPlayerStatus(song.isPlaying)
     }
     private fun setPlayerStatus(isPlaying: Boolean){
@@ -110,8 +119,8 @@ class SongActivity : AppCompatActivity() {
     
 
     inner class Timer(private val playTime: Int, var isPlaying: Boolean) : Thread(){
-        private var second: Int = 0
-        private var mills: Float = 0f
+        private var second: Int = song.second
+        private var mills: Float = (second * 1000).toFloat()
 
         override fun run() {
             super.run()
@@ -138,6 +147,11 @@ class SongActivity : AppCompatActivity() {
                     Log.d("Song", "쓰레드가 죽었습니다. ${e.message}")
                 }
             }
+        }
+
+        fun setTimer(time: Int){
+            second = time
+            mills = (second * 1000).toFloat()
         }
     }
 }
