@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity() {
     private fun setJson(){
         val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE)
         val songJson = sharedPreferences.getString("songData", null)
+        Log.d("json", "발동")
         song = if (songJson == null) {
             Song("Next Level", "Aespa", 0, 221, false, "next_level")
         } else{

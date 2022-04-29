@@ -15,7 +15,6 @@ class SongActivity : AppCompatActivity() {
     lateinit var song: Song
     lateinit var timer: Timer
 
-    private var currentPos = 0
     private var mediaPlayer: MediaPlayer? = null
     private var gson: Gson = Gson()
 
