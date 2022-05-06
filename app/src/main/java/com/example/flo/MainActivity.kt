@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import com.example.flo.databinding.ActivityMainBinding
 import com.google.gson.Gson
 
@@ -14,28 +15,27 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private lateinit var mainTimer: MainTimer
     private var mediaPlayer: MediaPlayer? = null
-    private var song: Song = Song()
+    private var songs = ArrayList<Song>()
+    private var nowPos: Int = 0
     private var gson: Gson = Gson()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setJson()
-        startMainTimer()
-
+        initOnClickListener()
+    }
+    private fun initOnClickListener(){
         binding.mainPlayerCl.setOnClickListener {
             // startActivity(Intent(this, SongActivity::class.java))
-            song.second = ((binding.mainMiniplayerSb.progress * song.playTime) ) / 1000
-            song.pos = mediaPlayer?.currentPosition!!
+            songs[nowPos].second = ((binding.mainMiniplayerSb.progress * songs[nowPos].playTime) ) / 1000
+            songs[nowPos].pos = mediaPlayer?.currentPosition!!
+
+            val editor = getSharedPreferences("song", MODE_PRIVATE).edit()
+            editor.putInt("songId", songs[nowPos].id)
+            editor.apply()
+
             val intent = Intent(this, SongActivity::class.java)
-            intent.putExtra("title", song.title)
-            intent.putExtra("singer", song.singer)
-            intent.putExtra("second", song.second)
-            intent.putExtra("playTime", song.playTime)
-            intent.putExtra("isPlaying", song.isPlaying)
-            intent.putExtra("music", song.music)
-            intent.putExtra("currentPos", song.pos)
             startActivity(intent)
         }
 
@@ -48,18 +48,30 @@ class MainActivity : AppCompatActivity() {
             setMiniPlayerStatus(false)
         }
 
-        Log.d("Song", song.title + song.singer)
+        binding.mainPreviouosBtn.setOnClickListener {
+            moveSong(-1)
+        }
+        binding.mainNextBtn.setOnClickListener {
+            moveSong(1)
+        }
     }
 
     private fun setMiniPlayer(song: Song){
         binding.mainMiniplayerTitle.text = song.title
         binding.mainMiniplayerSinger.text = song.singer
         binding.mainMiniplayerSb.progress = (song.second * 1000) / song.playTime
+
+
+        val music = resources.getIdentifier(songs[nowPos].music, "raw", this.packageName)
+        mediaPlayer = MediaPlayer.create(this, music)
+        mediaPlayer?.seekTo(songs[nowPos].pos)
+        startMainTimer()
+
         setMiniPlayerStatus(song.isPlaying)
     }
 
     private fun setMiniPlayerStatus(isPlaying: Boolean){
-        song.isPlaying = isPlaying
+        songs[nowPos].isPlaying = isPlaying
         mainTimer.isPlaying = isPlaying
         if(isPlaying) {
             binding.mainPauseBtn.visibility = View.VISIBLE
@@ -114,26 +126,99 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setJson(){
-        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE)
-        val songJson = sharedPreferences.getString("songData", null)
-        Log.d("json", "발동")
-        song = if (songJson == null) {
-            Song("Next Level", "Aespa", 0, 221, false, "next_level")
-        } else{
-            gson.fromJson(songJson, song::class.java)
+
+    private fun inputDummySongs(){
+        val songDB = SongDatabase.getInstance(this)!!
+        val songs = songDB.songDao().getSongs()
+
+        if (songs.isNotEmpty()) return;
+
+        songDB.songDao().insert(
+           Song(
+               "Next Level",
+               "Aespa",
+               0,
+               221,
+               false,
+               "next_level",
+               R.drawable.img_album_exp3,
+               false)
+        )
+
+        songDB.songDao().insert(
+            Song(
+                "Lilac",
+                "IU(아이유)",
+                0,
+                217,
+                false,
+                "lilac",
+                R.drawable.img_album_exp2,
+                false)
+        )
+        songDB.songDao().insert(
+            Song(
+                "Butter",
+                "BTS",
+                0,
+                222,
+                false,
+                "butter",
+                R.drawable.img_album_exp,
+                false)
+        )
+        val _songs = songDB.songDao().getSongs()
+        Log.d("DB Data", _songs.toString())
+    }
+
+
+
+    private fun getPlayingSong(songId: Int): Int{
+        for (i in 0..songs.size){
+            if (songs[i].id == songId)
+                return i
         }
+        return 0
+    }
+
+    private fun moveSong(direct: Int){
+        if (nowPos + direct < 0){
+            Toast.makeText(this, "First Song", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (nowPos + direct >= songs.size){
+            Toast.makeText(this, "Last Song", Toast.LENGTH_SHORT).show()
+            return
+        }
+        nowPos += direct
+
+        mainTimer.interrupt()
+        startMainTimer()
+
+        mediaPlayer?.release()
+        mediaPlayer = null
+
+        setMiniPlayer(songs[nowPos])
     }
 
     override fun onStart() {
         super.onStart()
-        setJson()
-        setMiniPlayer(song)
+        inputDummySongs()
 
-        startMainTimer()
-        val music = resources.getIdentifier(song.music, "raw", this.packageName)
-        mediaPlayer = MediaPlayer.create(this, music)
-        mediaPlayer?.seekTo(song.pos)
+        val spf = getSharedPreferences("song", MODE_PRIVATE)
+        val songId = spf.getInt("songId", 0)
+        val songDB = SongDatabase.getInstance(this)!!
+
+        songs.addAll(songDB.songDao().getSongs())
+
+        nowPos = if (songId == 0) 1 else{
+            getPlayingSong(songId)
+        }
+        Log.d("songId", songId.toString())
+        setMiniPlayer(songs[nowPos])
+
+
+
     }
 
     override fun onPause() {
@@ -150,12 +235,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startMainTimer(){
-        mainTimer = MainTimer(song.playTime, song.isPlaying)
+        mainTimer = MainTimer(songs[nowPos].playTime, songs[nowPos].isPlaying)
         mainTimer.start()
     }
 
     inner class MainTimer(private val playTime: Int, var isPlaying: Boolean) : Thread(){
-        private var second: Int = song.second
+        private var second: Int = songs[nowPos].second
         private var mills: Float = (second * 1000).toFloat()
 
         override fun run() {
@@ -175,6 +260,7 @@ class MainActivity : AppCompatActivity() {
                             second++
                     }
                 }catch (e : InterruptedException){
+                    isPlaying = false
                     Log.d("Song", "쓰레드가 죽었습니다. ${e.message}")
                 }
             }
