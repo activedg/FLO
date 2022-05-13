@@ -27,8 +27,8 @@ class SaveRVAdapter() : RecyclerView.Adapter<SaveRVAdapter.ViewHolder>() {
     override fun onBindViewHolder(holder: SaveRVAdapter.ViewHolder, position: Int) {
         holder.bind(songs[position])
         holder.binding.itemSaveMoreIv.setOnClickListener {
-            removeItem(position)
             mItemClickListener.onRemoveAlbum(songs[position].id)
+            removeItem(position)
         }
     }
 

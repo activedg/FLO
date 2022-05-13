@@ -27,9 +27,22 @@
         app:layout_constraintTop_toTopOf="@id/locker_title_tv"
         app:layout_constraintBottom_toBottomOf="@id/locker_title_tv"
         app:layout_constraintEnd_toEndOf="parent" />
+    <TextView
+        android:id="@+id/locker_user_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="회원님"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/locker_login_tv"
+        app:layout_constraintBottom_toBottomOf="@id/locker_login_tv"
+        app:layout_constraintEnd_toStartOf="@id/locker_login_tv" />
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/locker_content_tb"
-        android:layout_width="180dp"
+        android:layout_width="270dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginStart="10dp"
