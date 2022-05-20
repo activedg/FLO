@@ -25,6 +25,8 @@ class MainActivity : AppCompatActivity() {
 
         inputDummyAlbums()
         initOnClickListener()
+
+        Log.d("MAIN/JWT_TO_SERVER", getJwt().toString())
     }
     private fun initOnClickListener(){
         binding.mainPlayerCl.setOnClickListener {
@@ -241,6 +243,11 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer = null
 
         setMiniPlayer(songs[nowPos])
+    }
+
+    private fun getJwt(): String? {
+        val spf = getSharedPreferences("auth2", AppCompatActivity.MODE_PRIVATE)
+        return spf!!.getString("jwt", "")
     }
 
     override fun onStart() {

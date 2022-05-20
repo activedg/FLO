@@ -40,24 +40,24 @@ class LockerFragment : Fragment() {
         initViews()
     }
 
-    private fun getJwt(): Int{
-        val spf = activity?.getSharedPreferences("auth", AppCompatActivity.MODE_PRIVATE)
-        return spf!!.getInt("jwt", 0)
+    private fun getJwt2(): String?{
+        val spf = activity?.getSharedPreferences("auth2", AppCompatActivity.MODE_PRIVATE)
+        return spf!!.getString("jwt", "")
     }
 
     private fun initViews(){
-        val jwt: Int = getJwt()
-        if (jwt == 0){
+        val jwt: String = getJwt2()!!
+        if (jwt.isEmpty()){
             binding.lockerLoginTv.text = "로그인"
             binding.lockerLoginTv.setOnClickListener {
                 startActivity(Intent(activity, LoginActivity::class.java))
             }
         } else {
             binding.lockerLoginTv.text = "로그아웃"
-            val songDB = SongDatabase.getInstance(requireContext())!!
-            val userName = songDB.userDao().getUserName(jwt)!!
-            binding.lockerUserNameTv.text = userName + " 님"
-            binding.lockerUserNameTv.visibility = View.VISIBLE
+//            val songDB = SongDatabase.getInstance(requireContext())!!
+//            val userName = songDB.userDao().getUserName(jwt)!!
+//            binding.lockerUserNameTv.text = userName + " 님"
+//            binding.lockerUserNameTv.visibility = View.VISIBLE
             binding.lockerLoginTv.setOnClickListener {
                 // 로그아웃 진행
                 logout()
@@ -68,7 +68,7 @@ class LockerFragment : Fragment() {
     }
 
     private fun logout(){
-        val spf = activity?.getSharedPreferences("auth", AppCompatActivity.MODE_PRIVATE)
+        val spf = activity?.getSharedPreferences("auth2", AppCompatActivity.MODE_PRIVATE)
         val editor = spf!!.edit()
         editor.remove("jwt")
         editor.apply()

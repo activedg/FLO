@@ -4,10 +4,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import com.example.flo.databinding.ActivityLoginBinding
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity(), LoginView {
     lateinit var binding: ActivityLoginBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,16 +38,20 @@ class LoginActivity : AppCompatActivity() {
         val email: String = binding.loginIdEt.text.toString() + "@" + binding.loginDirectInputEt.text.toString()
         val pwd: String = binding.loginPasswordEt.text.toString()
 
-        val songDB = SongDatabase.getInstance(this)!!
-        val user = songDB.userDao().getUser(email, pwd)
+//        val songDB = SongDatabase.getInstance(this)!!
+//        val user = songDB.userDao().getUser(email, pwd)
+//
+//        user?.let {
+//            Log.d("Login Act / Get user", "user id : ${user.id}, $user")
+//            saveJwt(user.id)
+//            startMainActivity()
+//        }
+//
+//        if (user == null) Toast.makeText(this, "회원 정보가 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+        var authService = AuthService()
+        authService.setLoginView(this)
 
-        user?.let {
-            Log.d("Login Act / Get user", "user id : ${user.id}, $user")
-            saveJwt(user.id)
-            startMainActivity()
-        }
-
-        if (user == null) Toast.makeText(this, "회원 정보가 존재하지 않습니다.", Toast.LENGTH_SHORT).show()
+        authService.login(User(email, pwd, ""))
     }
 
     private fun saveJwt(jwt: Int){
@@ -57,8 +62,32 @@ class LoginActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    private fun saveJwt2(jwt: String){
+        val spf = getSharedPreferences("auth2", MODE_PRIVATE)
+        val editor = spf.edit()
+
+        editor.putString("jwt", jwt)
+        editor.apply()
+    }
+
     private fun startMainActivity(){
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+    }
+
+    override fun onLoginSuccess(code: Int, result: Result) {
+        when (code){
+            1000 -> {
+                saveJwt2(result.jwt)
+                Thread.sleep(1000)
+                startMainActivity()
+            }
+
+        }
+    }
+
+    override fun onLoginFailure(message: String) {
+        binding.loginErrorTv.visibility = View.VISIBLE
+        binding.loginErrorTv.text = message
     }
 }
